@@ -46,7 +46,6 @@ func main() {
 			println("no region provided, and metadata service unreachable.")
 			os.Exit(1)
 		}
-
 	}
 
 	config := &aws.Config{
@@ -63,7 +62,6 @@ func main() {
 		os.Exit(1)
 	}
 	var out *bufio.Writer
-	defer out.Flush()
 	if path == "" {
 		out = bufio.NewWriter(os.Stdout)
 	} else {
@@ -80,9 +78,9 @@ func main() {
 	}
 	reader := bufio.NewReader(object.Body)
 	_, err = reader.WriteTo(out)
+	defer out.Flush()
 	if err != nil {
 		println(err.Error())
 		os.Exit(1)
 	}
-	os.Exit(0)
 }
