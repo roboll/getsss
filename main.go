@@ -6,6 +6,7 @@ import (
 	"os"
 
 	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/ec2metadata"
 	"github.com/aws/aws-sdk-go/service/s3"
 )
 
@@ -32,9 +33,24 @@ func main() {
 		os.Exit(1)
 	}
 
-	config := &aws.Config{}
-	if region != "" {
-		config.Region = &region
+	if region == "" {
+		meta := ec2metadata.New(&ec2metadata.Config{})
+		if meta.Available() {
+			r, err := meta.Region()
+			if err != nil {
+				println(err.Error())
+				os.Exit(1)
+			}
+			region = r
+		} else {
+			println("no region provided, and metadata service unreachable.")
+			os.Exit(1)
+		}
+
+	}
+
+	config := &aws.Config{
+		Region: &region,
 	}
 
 	client := s3.New(config)
