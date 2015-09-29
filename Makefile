@@ -5,8 +5,8 @@ OWNER     := roboll
 REPO      := getsss
 
 PROJECT   := github.com/$(OWNER)/$(REPO)
-IMAGE_TAG := $(OWNER)/$(REPO):$(VERSION)
 VERSION   := $(shell git describe --tags)
+IMAGE_TAG := $(OWNER)/$(REPO):$(VERSION)
 
 GOOS      := linux
 GOARCH    := amd64
