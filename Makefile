@@ -14,14 +14,16 @@ BINARY    := $(REPO)-$(GOOS)-$(GOARCH)
 
 all: build
 build: target/$(BINARY) docker-build
-release: $(PRE_RELEASE) gh-release-$(BINARY) docker-release
+release: clean $(PRE_RELEASE) gh-release-$(BINARY) docker-release
 
+.PHONY: clean
+clean: ; rm -rf target
 ###############################################################################
 # pre-release - test and validation steps
 ###############################################################################
 PRE_RELEASE := test
 
-.PHONY: test
+.PHONY: test clean
 test: ; go test ./...
 
 ###############################################################################
@@ -51,7 +53,7 @@ target/%.tar.gz: target %
 docker-build: target/$(BINARY)
 	docker build -t $(IMAGE_TAG) .
 
-docker-release-%: target/$(BINARY) docker-build-$(BINARY)
+docker-release: target/$(BINARY) docker-build
 	docker push $(IMAGE_TAG)
 
 ###############################################################################
