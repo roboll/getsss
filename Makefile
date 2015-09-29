@@ -8,13 +8,13 @@ PROJECT   := github.com/$(OWNER)/$(REPO)
 IMAGE_TAG := $(OWNER)/$(REPO):$(VERSION)
 VERSION   := $(shell git describe --tags)
 
-GOOS     := linux
-GOARCH   := amd64
-BINARY   := $(REPO)-$(GOOS)-$(GOARCH)-$(VERSION)
+GOOS      := linux
+GOARCH    := amd64
+BINARY    := $(REPO)-$(GOOS)-$(GOARCH)
 
 all: build
-build: target/$(BINARY)
-release: $(PRE_RELEASE) gh-release-$(BINARY)
+build: target/$(BINARY) docker-build
+release: $(PRE_RELEASE) gh-release-$(BINARY) docker-release
 
 ###############################################################################
 # pre-release - test and validation steps
@@ -42,6 +42,17 @@ target/$(BINARY): target
 target/%.tar.gz: target %
 	@echo Packaging $* to target/$*.tar.gz.
 	@tar czf target/$*.tar.gz -C $* .
+
+###############################################################################
+# docker releases
+###############################################################################
+.PHONY: docker-build docker-release
+
+docker-build: target/$(BINARY)
+	docker build -t $(IMAGE_TAG) .
+
+docker-release-%: target/$(BINARY) docker-build-$(BINARY)
+	docker push $(IMAGE_TAG)
 
 ###############################################################################
 # github-release - upload a binary release to github releases
