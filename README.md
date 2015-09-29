@@ -2,6 +2,8 @@
 
 fetch from s3
 
+available on github releases as well as docker `docker run --rm roboll/getsss {args}`
+
 # options
 
     -asset string
